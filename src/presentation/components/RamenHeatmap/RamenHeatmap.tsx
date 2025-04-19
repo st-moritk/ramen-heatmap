@@ -7,19 +7,15 @@ import { HeatmapLayer } from "@deck.gl/aggregation-layers";
 import Map from "react-map-gl";
 import { HeatmapDataPoint } from "@/application/usecases/GetHeatmapDataUseCase";
 import { Box, Text } from "@chakra-ui/react";
-import { getUseCaseInstances } from "@/application/di/container";
-
-// Mapboxのアクセストークン（環境変数から取得）
-const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+import { useUseCaseContext } from "@/providers";
 
 /**
  * ラーメン店舗のヒートマップを表示するコンポーネント
  */
 export const RamenHeatmap: React.FC = () => {
-  // アプリケーション層からユースケースを取得
-  const { getRamenShopsUseCase, getHeatmapDataUseCase } = getUseCaseInstances();
+  const { getRamenShopsUseCase, getHeatmapDataUseCase, mapboxAccessToken } =
+    useUseCaseContext();
 
-  // ビューモデルを使用
   const {
     viewState,
     onViewStateChange,
@@ -30,12 +26,10 @@ export const RamenHeatmap: React.FC = () => {
     loadData,
   } = useRamenHeatmapViewModel(getRamenShopsUseCase, getHeatmapDataUseCase);
 
-  // コンポーネントのマウント時にデータを読み込む
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  // ヒートマップレイヤーを作成
   const layers = [
     new HeatmapLayer({
       id: "heatmap-layer",
@@ -92,7 +86,7 @@ export const RamenHeatmap: React.FC = () => {
       >
         <Map
           mapStyle="mapbox://styles/mapbox/light-v11"
-          mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
+          mapboxAccessToken={mapboxAccessToken}
         />
       </DeckGL>
 

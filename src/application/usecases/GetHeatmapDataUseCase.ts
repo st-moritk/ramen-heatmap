@@ -1,5 +1,6 @@
 import { RamenShop } from "../../domain/entities/RamenShop";
-import { RamenDensityService } from "../../domain/services/RamenDensityService";
+import { RamenDensityServicePort } from "../ports/RamenDensityServicePort";
+import { DensityDataPoint } from "../../domain/models/DensityDataPoint";
 
 /**
  * ヒートマップデータ型の定義
@@ -13,7 +14,7 @@ export interface HeatmapDataPoint {
  * ラーメン店のヒートマップデータを生成するユースケース
  */
 export class GetHeatmapDataUseCase {
-  constructor(private readonly densityService: RamenDensityService) {}
+  constructor(private readonly densityService: RamenDensityServicePort) {}
 
   /**
    * ラーメン店舗データからヒートマップデータを生成
@@ -25,6 +26,14 @@ export class GetHeatmapDataUseCase {
     shops: RamenShop[],
     boundingBox: [number, number, number, number]
   ): HeatmapDataPoint[] {
-    return this.densityService.calculateDensity(shops, boundingBox);
+    // ドメインサービスから得られるDensityDataPointをアプリ層のHeatmapDataPointにマッピング
+    const domainData: DensityDataPoint[] = this.densityService.calculateDensity(
+      shops,
+      boundingBox
+    );
+    return domainData.map((d) => ({
+      position: d.position,
+      density: d.density,
+    }));
   }
 }

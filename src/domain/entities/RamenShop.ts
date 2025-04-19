@@ -61,23 +61,4 @@ export class RamenShop {
   getIsOpen(): boolean {
     return this._isOpen ?? false;
   }
-
-  /**
-   * ジオJSON形式に変換
-   */
-  toGeoJson() {
-    return {
-      type: "Feature",
-      geometry: {
-        type: "Point",
-        coordinates: [this._location.longitude, this._location.latitude],
-      },
-      properties: {
-        id: this._id,
-        name: this._name,
-        type: this._type,
-        rating: this._rating,
-      },
-    };
-  }
 }

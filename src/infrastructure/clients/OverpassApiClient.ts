@@ -1,3 +1,5 @@
+import { OverpassApiPort } from "../../application/ports/OverpassApiPort";
+
 /**
  * OpenStreetMapのノード型
  */
@@ -28,7 +30,7 @@ export interface OverpassResponse {
 /**
  * Overpass APIクライアント
  */
-export class OverpassApiClient {
+export class OverpassApiClient implements OverpassApiPort {
   private readonly baseUrl = "https://overpass-api.de/api/interpreter";
 
   /**
@@ -54,6 +56,26 @@ export class OverpassApiClient {
       console.error("Overpass API request failed:", error);
       throw error;
     }
+  }
+
+  /**
+   * 指定されたエリア内のラーメン店を取得
+   */
+  async fetchRamenShops(bounds: {
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  }): Promise<OSMNode[]> {
+    const boundingBox: [number, number, number, number] = [
+      bounds.west,
+      bounds.south,
+      bounds.east,
+      bounds.north,
+    ];
+    const query = this.buildRamenQuery(boundingBox);
+    const response = await this.query(query);
+    return response.elements;
   }
 
   /**

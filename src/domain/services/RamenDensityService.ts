@@ -1,5 +1,5 @@
 import { RamenShop } from "../entities/RamenShop";
-import { HeatmapDataPoint } from "../../application/usecases/GetHeatmapDataUseCase";
+import { DensityDataPoint } from "../models/DensityDataPoint";
 
 /**
  * ラーメン店の密度を計算するドメインサービス
@@ -16,8 +16,8 @@ export class RamenDensityService {
     shops: RamenShop[],
     area: [number, number, number, number],
     gridSize: { x: number; y: number } = { x: 10, y: 10 }
-  ): HeatmapDataPoint[] {
-    const densityMap: HeatmapDataPoint[] = [];
+  ): DensityDataPoint[] {
+    const densityMap: DensityDataPoint[] = [];
 
     // エリアの幅と高さを計算
     const width = area[2] - area[0];
