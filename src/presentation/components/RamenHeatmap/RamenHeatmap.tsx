@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { useRamenHeatmapViewModel, ViewState } from "./RamenHeatmapViewModel";
 import DeckGL from "@deck.gl/react";
 import { HeatmapLayer } from "@deck.gl/aggregation-layers";
@@ -10,6 +10,7 @@ import { Box, Text } from "@chakra-ui/react";
 import { useUseCaseContext } from "@/providers";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { ScatterplotLayer } from "@deck.gl/layers";
 
 /**
  * ラーメン店舗のヒートマップを表示するコンポーネント
@@ -17,6 +18,14 @@ import "maplibre-gl/dist/maplibre-gl.css";
 export const RamenHeatmap: React.FC = () => {
   const { getRamenShopsUseCase, getHeatmapDataUseCase } = useUseCaseContext();
 
+  // hover情報保持
+  const [hoverInfo, setHoverInfo] = useState<{
+    x: number;
+    y: number;
+    shop: RamenShop;
+  } | null>(null);
+  // デバウンスタイマー
+  const timerRef = useRef<number | null>(null);
   const {
     viewState,
     onViewStateChange,
@@ -27,22 +36,49 @@ export const RamenHeatmap: React.FC = () => {
     shops,
   } = useRamenHeatmapViewModel(getRamenShopsUseCase, getHeatmapDataUseCase);
 
+  // viewState変化時に500ms後にloadDataを呼び、前のタイマーはクリア
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+    }
+    timerRef.current = window.setTimeout(() => {
+      loadData();
+    }, 500);
+    return () => {
+      if (timerRef.current) {
+        window.clearTimeout(timerRef.current);
+      }
+    };
+  }, [viewState, loadData]);
 
-  const layers = [
-    new HeatmapLayer({
-      id: "heatmap-layer",
-      data: shops,
-      getPosition: (shop: RamenShop) => shop.getPosition(),
-      getWeight: () => 1,
-      radiusPixels: heatmapSettings.radius,
-      intensity: heatmapSettings.intensity,
-      threshold: heatmapSettings.threshold,
-      colorRange: heatmapSettings.colorRange,
-    }),
-  ];
+  const layers = useMemo(
+    () => [
+      new HeatmapLayer({
+        id: "heatmap-layer",
+        data: shops,
+        getPosition: (shop: RamenShop) => shop.getPosition(),
+        getWeight: () => 1,
+        radiusPixels: heatmapSettings.radius,
+        intensity: heatmapSettings.intensity,
+        threshold: heatmapSettings.threshold,
+        colorRange: heatmapSettings.colorRange,
+      }),
+      new ScatterplotLayer({
+        id: "scatter-layer",
+        data: shops,
+        pickable: true,
+        radiusPixels: 10,
+        getPosition: (shop: RamenShop) => shop.getPosition(),
+        getFillColor: [0, 0, 0, 0],
+        onHover: (info: { x: number; y: number; object?: RamenShop }) => {
+          const { x, y, object } = info;
+          if (object) setHoverInfo({ x, y, shop: object });
+          else setHoverInfo(null);
+        },
+      }),
+    ],
+    [shops, heatmapSettings]
+  );
 
   return (
     <Box width="100%" height="100vh" position="relative">
@@ -77,6 +113,25 @@ export const RamenHeatmap: React.FC = () => {
         </Box>
       )}
 
+      {/* ポップアップ表示 */}
+      {hoverInfo && (
+        <Box
+          position="absolute"
+          left={hoverInfo.x + 10}
+          top={hoverInfo.y + 10}
+          bg="white"
+          p="2px 6px"
+          fontSize="xs"
+          borderRadius="3px"
+          boxShadow="0 0 5px rgba(0,0,0,0.3)"
+          pointerEvents="none"
+          zIndex={3}
+        >
+          {hoverInfo.shop.name}
+        </Box>
+      )}
+
+      {/* 地図領域 */}
       <DeckGL
         layers={layers}
         viewState={viewState}

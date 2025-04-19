@@ -7,6 +7,7 @@ import {
   GetHeatmapDataUseCase,
   HeatmapDataPoint,
 } from "@/application/usecases/GetHeatmapDataUseCase";
+// Web Worker 動的生成用、importは行わない
 
 export interface ViewState {
   longitude: number;
@@ -108,16 +109,35 @@ export const useRamenHeatmapViewModel = (
     setError(null);
 
     try {
-      // 現在の表示領域からバウンディングボックスを計算
       const boundingBox = calculateBoundingBox(viewState);
-
-      // ラーメン店データを取得
       const shopData = await getRamenShopsUseCase.execute(boundingBox);
       setShops(shopData);
 
-      // ヒートマップデータを生成
-      const heatmap = getHeatmapDataUseCase.execute(shopData, boundingBox);
-      setHeatmapData(heatmap);
+      // ヒートマップ集約を Web Worker でオフロード
+      if (typeof window !== "undefined" && typeof Worker !== "undefined") {
+        // public/workers 配下のスクリプトをロード
+        const worker = new Worker("/workers/densityWorker.js");
+        // positions と bbox を worker に渡す
+        worker.postMessage({
+          positions: shopData.map((s) => s.getPosition()),
+          bbox: boundingBox,
+        });
+        worker.onmessage = (e: MessageEvent<HeatmapDataPoint[]>) => {
+          setHeatmapData(e.data);
+          worker.terminate();
+        };
+        worker.onerror = (e: ErrorEvent) => {
+          console.error("Worker error:", e);
+          // フォールバック
+          const fallback = getHeatmapDataUseCase.execute(shopData, boundingBox);
+          setHeatmapData(fallback);
+          worker.terminate();
+        };
+      } else {
+        // Web Worker未サポート時は従来の同期処理
+        const heatmap = getHeatmapDataUseCase.execute(shopData, boundingBox);
+        setHeatmapData(heatmap);
+      }
     } catch (err) {
       console.error("データ取得エラー:", err);
       setError(

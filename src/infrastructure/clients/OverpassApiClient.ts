@@ -48,13 +48,14 @@ export class OverpassApiClient implements OverpassApiPort {
       });
 
       if (!response.ok) {
-        throw new Error(`Overpass API error: ${response.statusText}`);
+        console.warn(`Overpass API error response: ${response.statusText}`);
+        return { elements: [] };
       }
 
       return await response.json();
     } catch (error) {
-      console.error("Overpass API request failed:", error);
-      throw error;
+      console.warn("Overpass API request failed:", error);
+      return { elements: [] };
     }
   }
 
