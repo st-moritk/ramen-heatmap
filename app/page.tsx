@@ -1,5 +1,5 @@
 import React from "react";
-import { RamenHeatmap } from "./presentation/components/RamenHeatmap";
+import { RamenHeatmap } from "@/presentation/components/RamenHeatmap/RamenHeatmap";
 
 /**
  * Next.jsのメインページコンポーネント

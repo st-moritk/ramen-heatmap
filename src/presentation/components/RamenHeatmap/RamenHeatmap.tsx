@@ -1,21 +1,18 @@
 "use client";
 
 import React, { useEffect } from "react";
-import {
-  useRamenHeatmapViewModel,
-  ViewState,
-} from "../../../src/presentation/components/RamenHeatmap/RamenHeatmapViewModel";
+import { useRamenHeatmapViewModel, ViewState } from "./RamenHeatmapViewModel";
 import DeckGL from "@deck.gl/react";
 import { HeatmapLayer } from "@deck.gl/aggregation-layers";
 import Map from "react-map-gl";
-import { GetRamenShopsUseCase } from "../../../src/application/usecases/GetRamenShopsUseCase";
+import { GetRamenShopsUseCase } from "@/application/usecases/GetRamenShopsUseCase";
 import {
   GetHeatmapDataUseCase,
   HeatmapDataPoint,
-} from "../../../src/application/usecases/GetHeatmapDataUseCase";
-import { RamenDensityService } from "../../../src/domain/services/RamenDensityService";
-import { OverpassRamenShopRepository } from "../../../src/infrastructure/repositories/OverpassRamenShopRepository";
-import { OverpassApiClient } from "../../../src/infrastructure/clients/OverpassApiClient";
+} from "@/application/usecases/GetHeatmapDataUseCase";
+import { RamenDensityService } from "@/domain/services/RamenDensityService";
+import { OverpassRamenShopRepository } from "@/infrastructure/repositories/OverpassRamenShopRepository";
+import { OverpassApiClient } from "@/infrastructure/clients/OverpassApiClient";
 
 // Mapboxのアクセストークン（環境変数から取得）
 const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;

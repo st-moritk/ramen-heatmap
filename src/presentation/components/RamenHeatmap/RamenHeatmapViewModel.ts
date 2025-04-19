@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { RamenShop } from "../../../domain/entities/RamenShop";
-import { GetRamenShopsUseCase } from "../../../application/usecases/GetRamenShopsUseCase";
+import { RamenShop } from "@/domain/entities/RamenShop";
+import { GetRamenShopsUseCase } from "@/application/usecases/GetRamenShopsUseCase";
 import {
   GetHeatmapDataUseCase,
   HeatmapDataPoint,
-} from "../../../application/usecases/GetHeatmapDataUseCase";
+} from "@/application/usecases/GetHeatmapDataUseCase";
 
 export interface ViewState {
   longitude: number;
