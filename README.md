@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 東京ラーメンヒートマップ
 
-## Getting Started
+東京エリアのラーメン店舗分布をヒートマップで可視化する Web アプリケーション。
 
-First, run the development server:
+## 概要
+
+このプロジェクトは、OpenStreetMap のデータを使用して東京都内のラーメン店の密度をヒートマップで表示します。
+Next.js と deck.gl を組み合わせた地理空間データの可視化の実装例です。
+
+![スクリーンショット](./screenshot.png)
+
+## 技術スタック
+
+- **フロントエンド**
+
+  - Next.js
+  - TypeScript
+  - deck.gl (WebGL ベースの地理空間可視化ライブラリ)
+  - react-map-gl (Mapbox のラッパー)
+
+- **バックエンド**
+  - Next.js API Routes
+  - OpenStreetMap (Overpass API)
+
+## セットアップ
+
+### 前提条件
+
+- Node.js 16.8.0 以上
+- Mapbox API キー (無料で取得可能: https://account.mapbox.com/)
+
+### インストール
+
+1. リポジトリをクローン
+
+```bash
+git clone https://github.com/yourusername/ramen-heatmap.git
+cd ramen-heatmap
+```
+
+2. 依存パッケージをインストール
+
+```bash
+npm install
+# または
+yarn
+```
+
+3. 環境変数の設定
+   `.env.example`ファイルをコピーして`.env.local`を作成し、Mapbox API キーを設定します：
+
+```bash
+cp .env.example .env.local
+```
+
+`.env.local`ファイルを編集して Mapbox API キーを設定：
+
+```
+NEXT_PUBLIC_MAPBOX_TOKEN=your_mapbox_token_here
+```
+
+### 開発サーバーの起動
 
 ```bash
 npm run dev
-# or
+# または
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで http://localhost:3000 にアクセスすると、アプリケーションが表示されます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 主な機能
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- 東京エリアのラーメン店分布をヒートマップで可視化
+- 23 区別のデータ取得オプション
+- ズームレベルに応じたポイント表示切替
+- API Route によるデータ取得とキャッシュ
+- レスポンシブな UI
 
-## Learn More
+## API エンドポイント
 
-To learn more about Next.js, take a look at the following resources:
+- `/api/ramen` - 東京全体のラーメン店データを一度に取得
+- `/api/ramen?method=byWard` - 23 区ごとに分割してデータを取得（大量データ対策）
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 考慮点
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- 東京全域のデータが多い場合は、23 区ごとのデータ取得方法を使用
+- Overpass API のタイムアウトが発生する場合は、検索半径を縮小
 
-## Deploy on Vercel
+## ライセンス
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+MIT
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 謝辞
+
+- データ: © OpenStreetMap contributors
+- 可視化: deck.gl & react-map-gl
+- マップ: © Mapbox
