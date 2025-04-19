@@ -1,5 +1,6 @@
 import React from "react";
-import { RamenHeatmap } from "@/presentation/components/RamenHeatmap/RamenHeatmap";
+import { RamenHeatmap } from "../src/presentation/components/RamenHeatmap/RamenHeatmap";
+import { Box, Flex, Heading, Text, Link } from "@chakra-ui/react";
 
 /**
  * Next.jsのメインページコンポーネント
@@ -7,30 +8,35 @@ import { RamenHeatmap } from "@/presentation/components/RamenHeatmap/RamenHeatma
  */
 export default function Page() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="bg-gray-800 text-white p-4">
-        <div className="container mx-auto">
-          <h1 className="text-3xl font-bold">東京ラーメンヒートマップ</h1>
-          <p className="mt-2 text-gray-300">
+    <Flex direction="column" minH="100vh">
+      <Box as="header" bg="gray.800" color="white" p={4}>
+        <Box maxW="container.xl" mx="auto">
+          <Heading as="h1" size="xl" fontWeight="bold">
+            東京ラーメンヒートマップ
+          </Heading>
+          <Text mt={2} color="gray.300">
             東京エリアのラーメン店舗分布をヒートマップで可視化
-          </p>
-        </div>
-      </header>
+          </Text>
+        </Box>
+      </Box>
 
-      <main className="flex-grow">
+      <Box as="main" flex="1">
         <RamenHeatmap />
-      </main>
+      </Box>
 
-      <footer className="bg-gray-800 text-white p-4">
-        <div className="container mx-auto text-center">
-          <p className="text-sm">
+      <Box as="footer" bg="gray.800" color="white" p={4}>
+        <Box maxW="container.xl" mx="auto" textAlign="center">
+          <Text fontSize="sm">
             データソース:{" "}
-            <a href="https://www.openstreetmap.org" className="underline">
+            <Link
+              href="https://www.openstreetmap.org"
+              textDecoration="underline"
+            >
               OpenStreetMap
-            </a>
-          </p>
-        </div>
-      </footer>
-    </div>
+            </Link>
+          </Text>
+        </Box>
+      </Box>
+    </Flex>
   );
 }

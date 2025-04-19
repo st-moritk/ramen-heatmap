@@ -13,6 +13,7 @@ import {
 import { RamenDensityService } from "@/domain/services/RamenDensityService";
 import { OverpassRamenShopRepository } from "@/infrastructure/repositories/OverpassRamenShopRepository";
 import { OverpassApiClient } from "@/infrastructure/clients/OverpassApiClient";
+import { Box, Text } from "@chakra-ui/react";
 
 // Mapboxのアクセストークン（環境変数から取得）
 const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -59,40 +60,36 @@ export const RamenHeatmap: React.FC = () => {
   ];
 
   return (
-    <div style={{ width: "100%", height: "100vh", position: "relative" }}>
+    <Box width="100%" height="100vh" position="relative">
       {isLoading && (
-        <div
-          style={{
-            position: "absolute",
-            top: "10px",
-            left: "10px",
-            zIndex: 1,
-            backgroundColor: "white",
-            padding: "5px 10px",
-            borderRadius: "5px",
-            boxShadow: "0 0 10px rgba(0,0,0,0.2)",
-          }}
+        <Box
+          position="absolute"
+          top="10px"
+          left="10px"
+          zIndex={1}
+          bg="white"
+          p="5px 10px"
+          borderRadius="5px"
+          boxShadow="0 0 10px rgba(0,0,0,0.2)"
         >
           データを読み込み中...
-        </div>
+        </Box>
       )}
 
       {error && (
-        <div
-          style={{
-            position: "absolute",
-            top: "10px",
-            left: "10px",
-            zIndex: 1,
-            backgroundColor: "#fee",
-            color: "#c00",
-            padding: "5px 10px",
-            borderRadius: "5px",
-            boxShadow: "0 0 10px rgba(0,0,0,0.2)",
-          }}
+        <Box
+          position="absolute"
+          top="10px"
+          left="10px"
+          zIndex={1}
+          bg="#fee"
+          color="#c00"
+          p="5px 10px"
+          borderRadius="5px"
+          boxShadow="0 0 10px rgba(0,0,0,0.2)"
         >
           エラー: {error.message}
-        </div>
+        </Box>
       )}
 
       <DeckGL
@@ -109,20 +106,18 @@ export const RamenHeatmap: React.FC = () => {
         />
       </DeckGL>
 
-      <div
-        style={{
-          position: "absolute",
-          bottom: "10px",
-          right: "10px",
-          backgroundColor: "white",
-          padding: "5px 10px",
-          borderRadius: "5px",
-          boxShadow: "0 0 10px rgba(0,0,0,0.2)",
-          fontSize: "12px",
-        }}
+      <Box
+        position="absolute"
+        bottom="10px"
+        right="10px"
+        bg="white"
+        p="5px 10px"
+        borderRadius="5px"
+        boxShadow="0 0 10px rgba(0,0,0,0.2)"
+        fontSize="12px"
       >
-        ラーメン店舗数: {heatmapData.length}
-      </div>
-    </div>
+        <Text>ラーメン店舗数: {heatmapData.length}</Text>
+      </Box>
+    </Box>
   );
 };
