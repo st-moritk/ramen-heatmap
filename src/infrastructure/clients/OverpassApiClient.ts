@@ -1,0 +1,105 @@
+/**
+ * OpenStreetMapのノード型
+ */
+export interface OSMNode {
+  id: number;
+  type: string;
+  lat: number;
+  lon: number;
+  tags?: {
+    name?: string;
+    "name:ja"?: string;
+    cuisine?: string;
+    amenity?: string;
+    "ramen:type"?: string;
+    description?: string;
+    opening_hours?: string;
+    [key: string]: string | undefined;
+  };
+}
+
+/**
+ * Overpass APIのレスポンス型
+ */
+export interface OverpassResponse {
+  elements: OSMNode[];
+}
+
+/**
+ * Overpass APIクライアント
+ */
+export class OverpassApiClient {
+  private readonly baseUrl = "https://overpass-api.de/api/interpreter";
+
+  /**
+   * クエリを実行してデータを取得
+   * @param query Overpass QLクエリ
+   */
+  async query(query: string): Promise<OverpassResponse> {
+    try {
+      const response = await fetch(this.baseUrl, {
+        method: "POST",
+        body: query,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Overpass API error: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Overpass API request failed:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * 指定されたエリア内のラーメン店を取得するクエリを構築
+   * @param boundingBox エリアの境界ボックス [minLon, minLat, maxLon, maxLat]
+   */
+  buildRamenQuery(boundingBox: [number, number, number, number]): string {
+    const [minLon, minLat, maxLon, maxLat] = boundingBox;
+    return `
+      [out:json][timeout:25];
+      (
+        node["amenity"="restaurant"]["cuisine"="ramen"](${minLat},${minLon},${maxLat},${maxLon});
+        way["amenity"="restaurant"]["cuisine"="ramen"](${minLat},${minLon},${maxLat},${maxLon});
+        relation["amenity"="restaurant"]["cuisine"="ramen"](${minLat},${minLon},${maxLat},${maxLon});
+      );
+      out body;
+      >;
+      out skel qt;
+    `;
+  }
+
+  /**
+   * 指定されたタイプのラーメン店を取得するクエリを構築
+   * @param type ラーメン店のタイプ
+   * @param boundingBox オプションのエリア制限
+   */
+  buildRamenTypeQuery(
+    type: string,
+    boundingBox?: [number, number, number, number]
+  ): string {
+    let areaFilter = "";
+    if (boundingBox) {
+      const [minLon, minLat, maxLon, maxLat] = boundingBox;
+      areaFilter = `(${minLat},${minLon},${maxLat},${maxLon})`;
+    }
+
+    return `
+      [out:json][timeout:25];
+      (
+        node["amenity"="restaurant"]["cuisine"="ramen"]["ramen:type"="${type}"]${areaFilter};
+        way["amenity"="restaurant"]["cuisine"="ramen"]["ramen:type"="${type}"]${areaFilter};
+        relation["amenity"="restaurant"]["cuisine"="ramen"]["ramen:type"="${type}"]${areaFilter};
+      );
+      out body;
+      >;
+      out skel qt;
+    `;
+  }
+}

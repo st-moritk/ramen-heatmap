@@ -1,43 +1,36 @@
 import React from "react";
-import RamenHeatmap from "../components/RamenHeatmap";
+import { RamenHeatmap } from "./presentation/components/RamenHeatmap";
 
-export default function Home() {
+/**
+ * Next.jsのメインページコンポーネント
+ * プレゼンテーション層のアダプタ
+ */
+export default function Page() {
   return (
-    <main className="flex min-h-screen flex-col items-center p-4">
-      <header className="w-full max-w-5xl mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-2">池袋ラーメンヒートマップ</h1>
-        <p className="text-gray-600">
-          池袋エリアのラーメン店分布をヒートマップで可視化
-        </p>
+    <div className="flex flex-col min-h-screen">
+      <header className="bg-gray-800 text-white p-4">
+        <div className="container mx-auto">
+          <h1 className="text-3xl font-bold">東京ラーメンヒートマップ</h1>
+          <p className="mt-2 text-gray-300">
+            東京エリアのラーメン店舗分布をヒートマップで可視化
+          </p>
+        </div>
       </header>
 
-      <div className="w-full max-w-5xl">
-        <RamenHeatmap initialDataUrl="/api/ramen?mock=true" />
-      </div>
+      <main className="flex-grow">
+        <RamenHeatmap />
+      </main>
 
-      <footer className="w-full max-w-5xl mt-8 text-center text-sm text-gray-500">
-        <p>データソース: OpenStreetMap（Overpass API）</p>
-        <p>技術スタック: Next.js + deck.gl + react-map-gl</p>
-        <p className="mt-2">
-          <a
-            href="/api/ramen"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline"
-          >
-            APIエンドポイント
-          </a>
-          {" | "}
-          <a
-            href="/api/ramen?mock=true"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline"
-          >
-            モックデータAPI
-          </a>
-        </p>
+      <footer className="bg-gray-800 text-white p-4">
+        <div className="container mx-auto text-center">
+          <p className="text-sm">
+            データソース:{" "}
+            <a href="https://www.openstreetmap.org" className="underline">
+              OpenStreetMap
+            </a>
+          </p>
+        </div>
       </footer>
-    </main>
+    </div>
   );
 }
