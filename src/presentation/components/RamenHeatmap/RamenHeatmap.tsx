@@ -5,15 +5,9 @@ import { useRamenHeatmapViewModel, ViewState } from "./RamenHeatmapViewModel";
 import DeckGL from "@deck.gl/react";
 import { HeatmapLayer } from "@deck.gl/aggregation-layers";
 import Map from "react-map-gl";
-import { GetRamenShopsUseCase } from "@/application/usecases/GetRamenShopsUseCase";
-import {
-  GetHeatmapDataUseCase,
-  HeatmapDataPoint,
-} from "@/application/usecases/GetHeatmapDataUseCase";
-import { RamenDensityService } from "@/domain/services/RamenDensityService";
-import { OverpassRamenShopRepository } from "@/infrastructure/repositories/OverpassRamenShopRepository";
-import { OverpassApiClient } from "@/infrastructure/clients/OverpassApiClient";
+import { HeatmapDataPoint } from "@/application/usecases/GetHeatmapDataUseCase";
 import { Box, Text } from "@chakra-ui/react";
+import { getUseCaseInstances } from "@/application/di/container";
 
 // Mapboxのアクセストークン（環境変数から取得）
 const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -22,12 +16,8 @@ const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
  * ラーメン店舗のヒートマップを表示するコンポーネント
  */
 export const RamenHeatmap: React.FC = () => {
-  // 依存関係の構築
-  const apiClient = new OverpassApiClient();
-  const repository = new OverpassRamenShopRepository(apiClient);
-  const densityService = new RamenDensityService();
-  const getRamenShopsUseCase = new GetRamenShopsUseCase(repository);
-  const getHeatmapDataUseCase = new GetHeatmapDataUseCase(densityService);
+  // アプリケーション層からユースケースを取得
+  const { getRamenShopsUseCase, getHeatmapDataUseCase } = getUseCaseInstances();
 
   // ビューモデルを使用
   const {
