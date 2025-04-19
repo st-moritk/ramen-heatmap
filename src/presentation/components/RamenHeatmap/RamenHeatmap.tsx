@@ -4,26 +4,27 @@ import React, { useEffect } from "react";
 import { useRamenHeatmapViewModel, ViewState } from "./RamenHeatmapViewModel";
 import DeckGL from "@deck.gl/react";
 import { HeatmapLayer } from "@deck.gl/aggregation-layers";
-import Map from "react-map-gl";
-import { HeatmapDataPoint } from "@/application/usecases/GetHeatmapDataUseCase";
+import Map, { NavigationControl, Marker } from "react-map-gl";
+import { RamenShop } from "@/domain/entities/RamenShop";
 import { Box, Text } from "@chakra-ui/react";
 import { useUseCaseContext } from "@/providers";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 
 /**
  * ラーメン店舗のヒートマップを表示するコンポーネント
  */
 export const RamenHeatmap: React.FC = () => {
-  const { getRamenShopsUseCase, getHeatmapDataUseCase, mapboxAccessToken } =
-    useUseCaseContext();
+  const { getRamenShopsUseCase, getHeatmapDataUseCase } = useUseCaseContext();
 
   const {
     viewState,
     onViewStateChange,
-    heatmapData,
     heatmapSettings,
     isLoading,
     error,
     loadData,
+    shops,
   } = useRamenHeatmapViewModel(getRamenShopsUseCase, getHeatmapDataUseCase);
 
   useEffect(() => {
@@ -33,9 +34,9 @@ export const RamenHeatmap: React.FC = () => {
   const layers = [
     new HeatmapLayer({
       id: "heatmap-layer",
-      data: heatmapData,
-      getPosition: (d: HeatmapDataPoint) => d.position,
-      getWeight: (d: HeatmapDataPoint) => d.density,
+      data: shops,
+      getPosition: (shop: RamenShop) => shop.getPosition(),
+      getWeight: () => 1,
       radiusPixels: heatmapSettings.radius,
       intensity: heatmapSettings.intensity,
       threshold: heatmapSettings.threshold,
@@ -85,9 +86,16 @@ export const RamenHeatmap: React.FC = () => {
         controller={true}
       >
         <Map
-          mapStyle="mapbox://styles/mapbox/light-v11"
-          mapboxAccessToken={mapboxAccessToken}
-        />
+          mapLib={maplibregl}
+          mapStyle="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
+        >
+          <NavigationControl position="top-left" />
+          <Marker longitude={139.7109} latitude={35.7295} offset={[0, -10]}>
+            <Box bg="white" p="2px" borderRadius="3px" fontSize="12px">
+              池袋駅
+            </Box>
+          </Marker>
+        </Map>
       </DeckGL>
 
       <Box
@@ -100,7 +108,7 @@ export const RamenHeatmap: React.FC = () => {
         boxShadow="0 0 10px rgba(0,0,0,0.2)"
         fontSize="12px"
       >
-        <Text>ラーメン店舗数: {heatmapData.length}</Text>
+        <Text>ラーメン店舗数: {shops.length}</Text>
       </Box>
     </Box>
   );

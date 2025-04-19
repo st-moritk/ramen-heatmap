@@ -88,12 +88,9 @@ export class OverpassApiClient implements OverpassApiPort {
       [out:json][timeout:25];
       (
         node["amenity"="restaurant"]["cuisine"="ramen"](${minLat},${minLon},${maxLat},${maxLon});
-        way["amenity"="restaurant"]["cuisine"="ramen"](${minLat},${minLon},${maxLat},${maxLon});
-        relation["amenity"="restaurant"]["cuisine"="ramen"](${minLat},${minLon},${maxLat},${maxLon});
+        node["shop"="ramen"](${minLat},${minLon},${maxLat},${maxLon});
       );
       out body;
-      >;
-      out skel qt;
     `;
   }
 
