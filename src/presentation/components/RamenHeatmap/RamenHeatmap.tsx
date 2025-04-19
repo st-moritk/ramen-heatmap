@@ -15,9 +15,8 @@ import { ScatterplotLayer } from "@deck.gl/layers";
 /**
  * ラーメン店舗のヒートマップを表示するコンポーネント
  */
-export const RamenHeatmap: React.FC = () => {
+export const RamenHeatmap = (): JSX.Element => {
   const { getRamenShopsUseCase, getHeatmapDataUseCase } = useUseCaseContext();
-
   // hover情報保持
   const [hoverInfo, setHoverInfo] = useState<{
     x: number;
@@ -30,11 +29,78 @@ export const RamenHeatmap: React.FC = () => {
     viewState,
     onViewStateChange,
     heatmapSettings,
+    setHeatmapSettings,
     isLoading,
     error,
     loadData,
     shops,
   } = useRamenHeatmapViewModel(getRamenShopsUseCase, getHeatmapDataUseCase);
+
+  // 半径スライダーのローカルステートとデバウンスタイマー
+  const [sliderRadius, setSliderRadius] = useState(heatmapSettings.radius);
+  const debounceRadiusTimer = useRef<number | null>(null);
+  // 強度スライダーのローカルステートとデバウンスタイマー
+  const [sliderIntensity, setSliderIntensity] = useState(
+    heatmapSettings.intensity
+  );
+  const debounceIntensityTimer = useRef<number | null>(null);
+  // 閾値スライダーのローカルステートとデバウンスタイマー
+  const [sliderThreshold, setSliderThreshold] = useState(
+    heatmapSettings.threshold
+  );
+  const debounceThresholdTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    // heatmapSettings の変化をローカルスライダーに反映
+    setSliderRadius(heatmapSettings.radius);
+    setSliderIntensity(heatmapSettings.intensity);
+    setSliderThreshold(heatmapSettings.threshold);
+  }, [
+    heatmapSettings.radius,
+    heatmapSettings.intensity,
+    heatmapSettings.threshold,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      // 全てのデバウンスタイマーをクリア
+      if (debounceRadiusTimer.current)
+        window.clearTimeout(debounceRadiusTimer.current);
+      if (debounceIntensityTimer.current)
+        window.clearTimeout(debounceIntensityTimer.current);
+      if (debounceThresholdTimer.current)
+        window.clearTimeout(debounceThresholdTimer.current);
+    };
+  }, []);
+
+  const handleRadiusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value, 10);
+    setSliderRadius(val);
+    if (debounceRadiusTimer.current) {
+      window.clearTimeout(debounceRadiusTimer.current);
+    }
+    debounceRadiusTimer.current = window.setTimeout(() => {
+      setHeatmapSettings((prev) => ({ ...prev, radius: val }));
+    }, 200);
+  };
+  const handleIntensityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    setSliderIntensity(val);
+    if (debounceIntensityTimer.current)
+      window.clearTimeout(debounceIntensityTimer.current);
+    debounceIntensityTimer.current = window.setTimeout(() => {
+      setHeatmapSettings((prev) => ({ ...prev, intensity: val }));
+    }, 200);
+  };
+  const handleThresholdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    setSliderThreshold(val);
+    if (debounceThresholdTimer.current)
+      window.clearTimeout(debounceThresholdTimer.current);
+    debounceThresholdTimer.current = window.setTimeout(() => {
+      setHeatmapSettings((prev) => ({ ...prev, threshold: val }));
+    }, 200);
+  };
 
   // viewState変化時に500ms後にloadDataを呼び、前のタイマーはクリア
   useEffect(() => {
@@ -82,6 +148,62 @@ export const RamenHeatmap: React.FC = () => {
 
   return (
     <Box width="100%" height="100vh" position="relative">
+      {/* ヒートマップ設定パネル（ネイティブInput使用） */}
+      <Box
+        position="absolute"
+        top="10px"
+        right="10px"
+        bg="white"
+        p="3"
+        borderRadius="md"
+        boxShadow="md"
+        zIndex={4}
+        width="220px"
+      >
+        <Box mb="2">
+          <Text fontSize="xs" mb="1">
+            強度: {sliderIntensity.toFixed(1)}
+          </Text>
+          <input
+            type="range"
+            min="0.5"
+            max="5"
+            step="0.1"
+            value={sliderIntensity}
+            onChange={handleIntensityChange}
+            style={{ width: "100%" }}
+          />
+        </Box>
+        <Box mb="2">
+          <Text fontSize="xs" mb="1">
+            閾値: {sliderThreshold.toFixed(2)}
+          </Text>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={sliderThreshold}
+            onChange={handleThresholdChange}
+            style={{ width: "100%" }}
+          />
+        </Box>
+        <Box>
+          <Text fontSize="xs" mb="1">
+            半径: {sliderRadius}
+          </Text>
+          <input
+            type="range"
+            min="1"
+            max="100"
+            step="1"
+            value={sliderRadius}
+            onChange={handleRadiusChange}
+            style={{ width: "100%" }}
+          />
+        </Box>
+      </Box>
+
       {isLoading && (
         <Box
           position="absolute"

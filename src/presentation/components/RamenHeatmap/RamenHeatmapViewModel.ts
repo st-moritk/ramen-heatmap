@@ -33,11 +33,11 @@ const INITIAL_VIEW_STATE: ViewState = {
   bearing: 0,
 };
 
-// ヒートマップのデフォルト設定
+// ヒートマップのデフォルト設定（東京駅周辺の密集をより強調）
 const DEFAULT_HEATMAP_SETTINGS: HeatmapSettings = {
-  intensity: 1,
-  threshold: 0.03,
-  radius: 20,
+  intensity: 2,
+  threshold: 0.5,
+  radius: 50,
   colorRange: [
     [1, 152, 189],
     [73, 227, 206],
@@ -95,8 +95,10 @@ export const useRamenHeatmapViewModel = (
   const [shops, setShops] = useState<RamenShop[]>([]);
   // ヒートマップデータ
   const [heatmapData, setHeatmapData] = useState<HeatmapDataPoint[]>([]);
-  // ヒートマップ設定
-  const [heatmapSettings] = useState<HeatmapSettings>(DEFAULT_HEATMAP_SETTINGS);
+  // ヒートマップ設定（UIで動的に更新可能）
+  const [heatmapSettings, setHeatmapSettings] = useState<HeatmapSettings>(
+    DEFAULT_HEATMAP_SETTINGS
+  );
 
   // 表示領域が変更されたときのコールバック
   const onViewStateChange = useCallback((newViewState: ViewState) => {
@@ -154,6 +156,7 @@ export const useRamenHeatmapViewModel = (
     shops,
     heatmapData,
     heatmapSettings,
+    setHeatmapSettings,
     isLoading,
     error,
     loadData,
