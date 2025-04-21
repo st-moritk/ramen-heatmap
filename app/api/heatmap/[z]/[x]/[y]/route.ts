@@ -1,4 +1,4 @@
-import { getUseCaseInstances } from "@/application/di/container";
+import { getUseCaseInstances } from "@/di/container";
 import { NextResponse } from "next/server";
 
 /**

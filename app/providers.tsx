@@ -2,7 +2,7 @@
 
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { ReactNode, createContext, useContext } from "react";
-import { getUseCaseInstances } from "@/application/di/container";
+import { getUseCaseInstances } from "@/di/container";
 
 /** UseCaseインスタンスを提供するコンテキスト */
 export const UseCaseContext = createContext<ReturnType<
