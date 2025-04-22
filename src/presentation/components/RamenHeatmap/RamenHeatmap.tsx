@@ -29,12 +29,12 @@ export const RamenHeatmap = (): JSX.Element => {
   const {
     viewState,
     onViewStateChange,
+    shops,
     heatmapSettings,
     setHeatmapSettings,
     isLoading,
     error,
     loadData,
-    shops,
   } = useRamenHeatmapViewModel(getRamenShopsUseCase);
 
   // viewState変化時に500ms後にloadDataを呼び、前のタイマーはクリア
