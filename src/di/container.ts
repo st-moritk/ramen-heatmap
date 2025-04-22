@@ -14,6 +14,5 @@ export function getUseCaseInstances() {
 
   return {
     getRamenShopsUseCase,
-    mapboxAccessToken: process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "",
   };
 }
