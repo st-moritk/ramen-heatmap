@@ -11,6 +11,20 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.svg",
   },
+  openGraph: {
+    type: "website",
+    locale: "ja_JP",
+    url: "https://yourdomain.com/",
+    title: "東京ラーメンヒートマップ",
+    description: "東京エリアのラーメン店舗分布をヒートマップで可視化",
+    images: ["/screenshot.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "東京ラーメンヒートマップ",
+    description: "東京エリアのラーメン店舗分布をヒートマップで可視化",
+    images: ["/screenshot.png"],
+  },
 };
 
 export default function RootLayout({

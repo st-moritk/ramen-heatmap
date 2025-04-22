@@ -1,5 +1,7 @@
 # 東京ラーメンヒートマップ
 
+![スクリーンショット](./screenshot.png)
+
 OpenStreetMap の Overpass API を利用し、東京都内のラーメン店の位置情報をヒートマップで可視化する Web アプリケーション。
 
 ## 概要
