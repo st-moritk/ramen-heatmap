@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "東京ラーメンヒートマップ",
   description: "東京エリアのラーメン店舗分布をヒートマップで可視化",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
