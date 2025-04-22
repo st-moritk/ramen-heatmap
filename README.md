@@ -1,91 +1,70 @@
 # 東京ラーメンヒートマップ
 
-東京エリアのラーメン店舗分布をヒートマップで可視化する Web アプリケーション。
+OpenStreetMap の Overpass API を利用し、東京都内のラーメン店の位置情報をヒートマップで可視化する Web アプリケーション。
 
 ## 概要
 
-このプロジェクトは、OpenStreetMap のデータを使用して東京都内のラーメン店の密度をヒートマップで表示します。
-Next.js と deck.gl を組み合わせた地理空間データの可視化の実装例です。
-
-![スクリーンショット](./screenshot.png)
+- クライアントサイドで Overpass API へ直接クエリを投げ、ラーメン店データを取得
+- deck.gl の HeatmapLayer を使った密度可視化
+- MapLibre GL + Carto のベースマップを表示
+- ヒートマップの色、半径、閾値などを UI から動的に調整可能
 
 ## 技術スタック
 
-- **フロントエンド**
-
-  - Next.js
-  - TypeScript
-  - deck.gl (WebGL ベースの地理空間可視化ライブラリ)
-  - react-map-gl (Mapbox のラッパー)
-
-- **バックエンド**
-  - Next.js API Routes
-  - OpenStreetMap (Overpass API)
+- Next.js 14 (App Router)
+- React
+- TypeScript
+- deck.gl
+- react-map-gl (MapLibre GL 統合)
+- Chakra UI
 
 ## セットアップ
 
 ### 前提条件
 
 - Node.js 16.8.0 以上
-- Mapbox API キー (無料で取得可能: https://account.mapbox.com/)
 
-### インストール
-
-1. リポジトリをクローン
+### インストール＆起動
 
 ```bash
+# リポジトリをクローン
 git clone https://github.com/yourusername/ramen-heatmap.git
 cd ramen-heatmap
-```
 
-2. 依存パッケージをインストール
-
-```bash
+# 依存パッケージをインストール
 npm install
-# または
-yarn
-```
+# または yarn
 
-3. 環境変数の設定
-   `.env.example`ファイルをコピーして`.env.local`を作成し、Mapbox API キーを設定します：
-
-```bash
-cp .env.example .env.local
-```
-
-`.env.local`ファイルを編集して Mapbox API キーを設定：
-
-```
-NEXT_PUBLIC_MAPBOX_TOKEN=your_mapbox_token_here
-```
-
-### 開発サーバーの起動
-
-```bash
+# 開発サーバーを起動
 npm run dev
-# または
-yarn dev
+# または yarn dev
 ```
 
-ブラウザで http://localhost:3000 にアクセスすると、アプリケーションが表示されます。
+ブラウザで http://localhost:3000 を開くとアプリが起動します。
 
 ## 主な機能
 
-- 東京エリアのラーメン店分布をヒートマップで可視化
-- 23 区別のデータ取得オプション
-- ズームレベルに応じたポイント表示切替
-- API Route によるデータ取得とキャッシュ
-- レスポンシブな UI
+- 東京都内のラーメン店分布をヒートマップで可視化
+- ズームや回転に応じて表示を更新
+- ヒートマップの視覚設定をスライダーで調整
 
-## API エンドポイント
+## フォルダ構成
 
-- `/api/ramen` - 東京全体のラーメン店データを一度に取得
-- `/api/ramen?method=byWard` - 23 区ごとに分割してデータを取得（大量データ対策）
-
-## 考慮点
-
-- 東京全域のデータが多い場合は、23 区ごとのデータ取得方法を使用
-- Overpass API のタイムアウトが発生する場合は、検索半径を縮小
+```
+ramen-heatmap/
+├─ app/                 # Next.js App Router
+│  ├─ layout.tsx        # RootLayout, favicon 設定
+│  ├─ page.tsx          # メインページ
+│  └─ providers.tsx     # UseCase 層のコンテキスト提供
+├─ src/
+│  ├─ application/      # ユースケース
+│  ├─ domain/           # ドメインモデル／リポジトリ定義
+│  ├─ infrastructure/   # Overpass API クライアント、リポジトリ実装
+│  └─ presentation/     # React コンポーネント／ViewModel
+├─ public/              # 静的アセット (favicon.svg など)
+├─ README.md            # このファイル
+└─ package.json
+```
 
 ## ライセンス
 
