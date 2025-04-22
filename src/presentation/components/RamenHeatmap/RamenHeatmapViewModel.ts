@@ -3,10 +3,6 @@
 import { useState, useCallback } from "react";
 import { RamenShop } from "@/domain/entities/RamenShop";
 import { GetRamenShopsUseCase } from "@/application/usecases/GetRamenShopsUseCase";
-import {
-  GetHeatmapDataUseCase,
-  HeatmapDataPoint,
-} from "@/application/usecases/GetHeatmapDataUseCase";
 // Web Worker 動的生成用、importは行わない
 
 export interface ViewState {
@@ -82,8 +78,7 @@ const calculateBoundingBox = (
  * ラーメンヒートマップのビューモデルカスタムフック
  */
 export const useRamenHeatmapViewModel = (
-  getRamenShopsUseCase: GetRamenShopsUseCase,
-  getHeatmapDataUseCase: GetHeatmapDataUseCase
+  getRamenShopsUseCase: GetRamenShopsUseCase
 ) => {
   // ビュー状態
   const [viewState, setViewState] = useState<ViewState>(INITIAL_VIEW_STATE);
@@ -93,8 +88,6 @@ export const useRamenHeatmapViewModel = (
   const [error, setError] = useState<Error | null>(null);
   // 店舗データ
   const [shops, setShops] = useState<RamenShop[]>([]);
-  // ヒートマップデータ
-  const [heatmapData, setHeatmapData] = useState<HeatmapDataPoint[]>([]);
   // ヒートマップ設定（UIで動的に更新可能）
   const [heatmapSettings, setHeatmapSettings] = useState<HeatmapSettings>(
     DEFAULT_HEATMAP_SETTINGS
@@ -114,32 +107,6 @@ export const useRamenHeatmapViewModel = (
       const boundingBox = calculateBoundingBox(viewState);
       const shopData = await getRamenShopsUseCase.execute(boundingBox);
       setShops(shopData);
-
-      // ヒートマップ集約を Web Worker でオフロード
-      if (typeof window !== "undefined" && typeof Worker !== "undefined") {
-        // public/workers 配下のスクリプトをロード
-        const worker = new Worker("/workers/densityWorker.js");
-        // positions と bbox を worker に渡す
-        worker.postMessage({
-          positions: shopData.map((s) => s.getPosition()),
-          bbox: boundingBox,
-        });
-        worker.onmessage = (e: MessageEvent<HeatmapDataPoint[]>) => {
-          setHeatmapData(e.data);
-          worker.terminate();
-        };
-        worker.onerror = (e: ErrorEvent) => {
-          console.error("Worker error:", e);
-          // フォールバック
-          const fallback = getHeatmapDataUseCase.execute(shopData, boundingBox);
-          setHeatmapData(fallback);
-          worker.terminate();
-        };
-      } else {
-        // Web Worker未サポート時は従来の同期処理
-        const heatmap = getHeatmapDataUseCase.execute(shopData, boundingBox);
-        setHeatmapData(heatmap);
-      }
     } catch (err) {
       console.error("データ取得エラー:", err);
       setError(
@@ -148,13 +115,12 @@ export const useRamenHeatmapViewModel = (
     } finally {
       setIsLoading(false);
     }
-  }, [viewState, getRamenShopsUseCase, getHeatmapDataUseCase]);
+  }, [viewState, getRamenShopsUseCase]);
 
   return {
     viewState,
     onViewStateChange,
     shops,
-    heatmapData,
     heatmapSettings,
     setHeatmapSettings,
     isLoading,

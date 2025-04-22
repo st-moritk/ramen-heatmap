@@ -39,32 +39,6 @@ export class OverpassRamenShopRepository implements IRamenShopRepository {
   }
 
   /**
-   * 指定されたタイプのラーメン店を取得
-   * @param type ラーメン店のタイプ（例：二郎系、家系）
-   * @param boundingBox オプションのエリア制限
-   */
-  async findByType(
-    type: string,
-    boundingBox?: [number, number, number, number]
-  ): Promise<RamenShop[]> {
-    if (boundingBox) {
-      const shops = await this.findByArea(boundingBox);
-      return shops.filter((shop) => shop.type === type);
-    }
-
-    // 全国検索は効率が悪いため、東京エリアを設定
-    const tokyoArea: [number, number, number, number] = [
-      139.5, // 西経（東京西部）
-      35.5, // 南緯（東京南部）
-      140.0, // 東経（東京東部）
-      36.0, // 北緯（東京北部）
-    ];
-
-    const shops = await this.findByArea(tokyoArea);
-    return shops.filter((shop) => shop.type === type);
-  }
-
-  /**
    * API取得データをドメインエンティティに変換
    */
   private mapToEntities(elements: OSMNode[]): RamenShop[] {

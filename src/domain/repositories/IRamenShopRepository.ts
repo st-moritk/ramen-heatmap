@@ -11,14 +11,4 @@ export interface IRamenShopRepository {
   findByArea(
     boundingBox: [number, number, number, number]
   ): Promise<RamenShop[]>;
-
-  /**
-   * 指定されたタイプのラーメン店を取得
-   * @param type ラーメン店のタイプ
-   * @param boundingBox オプションのエリア制限
-   */
-  findByType(
-    type: string,
-    boundingBox?: [number, number, number, number]
-  ): Promise<RamenShop[]>;
 }

@@ -17,7 +17,7 @@ import { HeatmapSettingsPanel } from "./HeatmapSettingsPanel";
  * ラーメン店舗のヒートマップを表示するコンポーネント
  */
 export const RamenHeatmap = (): JSX.Element => {
-  const { getRamenShopsUseCase, getHeatmapDataUseCase } = useUseCaseContext();
+  const { getRamenShopsUseCase } = useUseCaseContext();
   // hover情報保持
   const [hoverInfo, setHoverInfo] = useState<{
     x: number;
@@ -35,7 +35,7 @@ export const RamenHeatmap = (): JSX.Element => {
     error,
     loadData,
     shops,
-  } = useRamenHeatmapViewModel(getRamenShopsUseCase, getHeatmapDataUseCase);
+  } = useRamenHeatmapViewModel(getRamenShopsUseCase);
 
   // viewState変化時に500ms後にloadDataを呼び、前のタイマーはクリア
   useEffect(() => {
@@ -82,7 +82,12 @@ export const RamenHeatmap = (): JSX.Element => {
   );
 
   return (
-    <Box width="100%" height="100vh" position="relative">
+    <Box
+      width="100%"
+      height="100vh"
+      position="relative"
+      onContextMenu={(e) => e.preventDefault()}
+    >
       {/* ヒートマップ設定パネル */}
       <HeatmapSettingsPanel
         heatmapSettings={heatmapSettings}

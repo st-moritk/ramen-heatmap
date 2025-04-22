@@ -13,7 +13,6 @@ export interface OSMNode {
     "name:ja"?: string;
     cuisine?: string;
     amenity?: string;
-    "ramen:type"?: string;
     description?: string;
     opening_hours?: string;
     [key: string]: string | undefined;
@@ -92,34 +91,6 @@ export class OverpassApiClient implements OverpassApiPort {
         node["shop"="ramen"](${minLat},${minLon},${maxLat},${maxLon});
       );
       out body;
-    `;
-  }
-
-  /**
-   * 指定されたタイプのラーメン店を取得するクエリを構築
-   * @param type ラーメン店のタイプ
-   * @param boundingBox オプションのエリア制限
-   */
-  buildRamenTypeQuery(
-    type: string,
-    boundingBox?: [number, number, number, number]
-  ): string {
-    let areaFilter = "";
-    if (boundingBox) {
-      const [minLon, minLat, maxLon, maxLat] = boundingBox;
-      areaFilter = `(${minLat},${minLon},${maxLat},${maxLon})`;
-    }
-
-    return `
-      [out:json][timeout:25];
-      (
-        node["amenity"="restaurant"]["cuisine"="ramen"]["ramen:type"="${type}"]${areaFilter};
-        way["amenity"="restaurant"]["cuisine"="ramen"]["ramen:type"="${type}"]${areaFilter};
-        relation["amenity"="restaurant"]["cuisine"="ramen"]["ramen:type"="${type}"]${areaFilter};
-      );
-      out body;
-      >;
-      out skel qt;
     `;
   }
 }
