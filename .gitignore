@@ -41,5 +41,4 @@ yarn-error.log*
 next-env.d.ts
 
 # ignore design document
-DESIGN.md
-zenn-ramen-heatmap.md
+/docs
