@@ -15,7 +15,7 @@
 
 # next.js
 /.next/
-/out/
+# /out/ # GitHub Pages デプロイのためにコメントアウト
 
 # production
 /build
