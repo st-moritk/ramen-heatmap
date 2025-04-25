@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, Button, Flex } from "@chakra-ui/react";
+import { FiMenu, FiX } from "react-icons/fi";
 import { HeatmapSettings } from "./RamenHeatmapViewModel";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface HeatmapSettingsPanelProps {
   heatmapSettings: HeatmapSettings;
@@ -23,6 +25,17 @@ export const HeatmapSettingsPanel = ({
     heatmapSettings.threshold
   );
   const debounceThresholdTimer = useRef<number | null>(null);
+
+  const [isOpen, setIsOpen] = useState(true);
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    if (isMobile) {
+      setIsOpen(false);
+    } else {
+      setIsOpen(true);
+    }
+  }, [isMobile]);
 
   useEffect(() => {
     setSliderRadius(heatmapSettings.radius);
@@ -75,6 +88,30 @@ export const HeatmapSettingsPanel = ({
     }, 200);
   };
 
+  const togglePanel = () => setIsOpen(!isOpen);
+
+  if (!isOpen && isMobile) {
+    return (
+      <Button
+        aria-label="設定を開く"
+        position="absolute"
+        top="10px"
+        right="10px"
+        zIndex={4}
+        onClick={togglePanel}
+        size="sm"
+        colorScheme="whiteAlpha"
+        backgroundColor="rgba(74, 85, 105, 0.85)"
+        color="white"
+        boxShadow="md"
+        p="2"
+        minW="auto"
+      >
+        <Box as={FiMenu} fontSize="20px" />
+      </Button>
+    );
+  }
+
   return (
     <Box
       position="absolute"
@@ -85,8 +122,28 @@ export const HeatmapSettingsPanel = ({
       borderRadius="md"
       boxShadow="md"
       zIndex={4}
-      width="220px"
+      width={{ base: "calc(100% - 20px)", md: "220px" }}
+      display={isOpen ? "block" : "none"}
     >
+      {isMobile && (
+        <Button
+          aria-label="設定を閉じる"
+          size="sm"
+          position="absolute"
+          top="8px"
+          right="8px"
+          onClick={togglePanel}
+          variant="ghost"
+          p="1"
+        >
+          <Box as={FiX} />
+        </Button>
+      )}
+      <Box mb={isMobile ? "8" : "2"}>
+        <Text fontSize="sm" fontWeight="bold" mb="2">
+          ヒートマップ設定
+        </Text>
+      </Box>
       <Box mb="2">
         <Text fontSize="xs" mb="1">
           強度: {sliderIntensity.toFixed(1)}

@@ -12,6 +12,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { ScatterplotLayer } from "@deck.gl/layers";
 import { HeatmapSettingsPanel } from "./HeatmapSettingsPanel";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 /**
  * ラーメン店舗のヒートマップを表示するコンポーネント
@@ -24,6 +25,8 @@ export const RamenHeatmap = (): JSX.Element => {
     y: number;
     shop: RamenShop;
   } | null>(null);
+  // モバイル判定
+  const isMobile = useIsMobile();
   // デバウンスタイマー
   const timerRef = useRef<number | null>(null);
   const {
@@ -71,15 +74,32 @@ export const RamenHeatmap = (): JSX.Element => {
         radiusPixels: 10,
         getPosition: (shop: RamenShop) => shop.getPosition(),
         getFillColor: [0, 0, 0, 0],
-        onHover: (info: { x: number; y: number; object?: RamenShop }) => {
-          const { x, y, object } = info;
-          if (object) setHoverInfo({ x, y, shop: object });
-          else setHoverInfo(null);
-        },
+        // PCではhover、モバイルではクリックで情報表示
+        onClick: isMobile
+          ? (info: { x: number; y: number; object?: RamenShop }) => {
+              const { x, y, object } = info;
+              if (object) setHoverInfo({ x, y, shop: object });
+              else setHoverInfo(null);
+            }
+          : undefined,
+        onHover: !isMobile
+          ? (info: { x: number; y: number; object?: RamenShop }) => {
+              const { x, y, object } = info;
+              if (object) setHoverInfo({ x, y, shop: object });
+              else setHoverInfo(null);
+            }
+          : undefined,
       }),
     ],
-    [shops, heatmapSettings]
+    [shops, heatmapSettings, isMobile]
   );
+
+  // タップでポップアップを閉じる機能（モバイルのみ）
+  const handleMapClick = () => {
+    if (isMobile && hoverInfo) {
+      setHoverInfo(null);
+    }
+  };
 
   return (
     <Box
@@ -87,6 +107,7 @@ export const RamenHeatmap = (): JSX.Element => {
       height="100vh"
       position="relative"
       onContextMenu={(e) => e.preventDefault()}
+      onClick={handleMapClick}
     >
       {/* ヒートマップ設定パネル */}
       <HeatmapSettingsPanel

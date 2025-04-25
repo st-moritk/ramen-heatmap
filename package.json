@@ -10,8 +10,9 @@
     "export": "next build"
   },
   "dependencies": {
+    "@chakra-ui/icons": "^2.2.4",
     "@chakra-ui/next-js": "^2.4.2",
-    "@chakra-ui/react": "^3.16.0",
+    "@chakra-ui/react": "^3.16.1",
     "@deck.gl/aggregation-layers": "^8.9.27",
     "@deck.gl/layers": "^8.9.27",
     "@deck.gl/react": "^8.9.27",
@@ -25,6 +26,7 @@
     "next": "14.0.3",
     "react": "^18",
     "react-dom": "^18",
+    "react-icons": "^5.5.0",
     "react-map-gl": "^7.1.6"
   },
   "devDependencies": {
